@@ -1,0 +1,231 @@
+<dom-module id="h-address">
+    <style>
+        :host {
+            height: 34px;
+            display: inline-block;
+            outline: none;
+        }
+
+        .input-warp {
+            display: inline-block;
+            float: left;
+        }
+
+        .label-size {
+            line-height: 34px;
+            vertical-align: middle;
+            float: left;
+        }
+        .input-size{
+            min-width: 170px;
+            width: 100%;
+        }
+        .icon-close,
+        .icon-arrow-down{
+            height: 34px;
+            width: 34px;
+            position: absolute;
+            margin-left: -25px;
+            margin-top: -26px;
+        }
+        iron-dropdown {
+            position: relative;
+            display: block;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            width: 100%;
+            min-width: 350px;
+            z-index: 5;
+            background: white;
+        }
+
+        paper-tabs {
+            margin: 0;
+            display: flex;
+            padding: 0;
+            border-right: 1px solid #ddd;
+        }
+
+        paper-tab {
+            flex-grow: 1;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+            border-right-width: 0;
+            font-size: 12px;
+        }
+        paper-tabs[noink][no-bar] paper-tab.iron-selected,
+        paper-tabs[noink][no-bar] paper-tab.iron-selected:focus{
+            font-weight: normal;
+        }
+        .tabs-content {
+            border: 1px solid #ddd;
+            border-top: none;
+            overflow: hidden;
+            /*height: 150px;*/
+            min-width: 350px;
+        }
+
+        .tabs-content ul {
+            /*max-height: 150px;*/
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: block;
+            margin: 5px 0;
+        }
+        li {
+            float: left;
+            width: 20%;
+            text-align: center;
+            overflow: hidden;
+            list-style-type: none;
+            padding: 5px 0;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+            color: #777777;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: #337ab7;
+        }
+
+        li.selected {
+            background-color: #8fb6d8;
+            color: #fff;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        li.selected:hover {
+            color: #fff;
+        }
+
+        a.selected {
+            background-color: #8fb6d8;
+            color: #fff;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        a.selected:hover {
+            color: #fff;
+        }
+        .pull-right{
+            float: right;
+        }
+        input[readonly]{
+            background-color: #fff;
+            cursor: pointer;
+        }
+    </style>
+    <template>
+        <label class="label-size"><span>[[label]]</span>：</label>
+        <template is="dom-if" if="{{isEdit}}">
+        <div class="input-warp" on-click="open" style$="{{_getTagsBoxWidth(width)}}">
+            <div class="input-box">
+                <input placeholder="请选择地址" readonly type="text" class="input-size form-control" is="iron-input" bind-value="{{detailAddress}}" id="keywordInput"
+                       style$="{{_getInputStyle(width)}}">
+                <div class="pull-right">
+                    <!--无值时显示下拉箭头-->
+                    <template is="dom-if" if="{{_hasInput(detailAddress, 0)}}">
+                        <paper-icon-button class="icon-arrow-down" icon="icons:arrow-drop-down"></paper-icon-button>
+                    </template>
+                    <!--有值显示清除×图标-->
+                    <template is="dom-if" if="{{_hasInput(detailAddress, 1)}}">
+                        <paper-icon-button class="icon-close" icon="icons:close" on-click="initPage"></paper-icon-button>
+                    </template>
+                </div>
+            </div>
+            <iron-dropdown id="dropdown" horizontal-align="right" vertical-align="top" style="left: 0; top: 0;">
+                <div id="dropdown-content" class="dropdown-content">
+                    <paper-tabs class="h-asddress-tabs" selected="{{tabIndex}}" noink no-bar hideScrollButtons>
+                        <paper-tab>
+                            <span>常用</span>
+                        </paper-tab>
+                        <paper-tab>
+                            <span>省</span>
+                        </paper-tab>
+                        <template is="dom-if" if="{{_hasShow(level, 2)}}">
+                            <paper-tab>
+                                <span>市</span>
+                            </paper-tab>
+                        </template>
+                        <template is="dom-if" if="{{_hasShow(level, 3)}}">
+                            <paper-tab>
+                                <span>区/县</span>
+                            </paper-tab>
+                        </template>
+                        <template is="dom-if" if="{{_hasShow(level, 4)}}">
+                            <paper-tab>
+                                <span>镇/街道</span>
+                            </paper-tab>
+                        </template>
+                    </paper-tabs>
+                    <div class="tabs-content">
+                        <template is="dom-if" if="{{showTabIndex(0,tabIndex)}}">
+                            <ul id="common" on-click="chooseCommon">
+                                <template is="dom-repeat" items="[[commonItems]]">
+                                    <li id$="{{showString(item.value)}}" data-args="{{item}}">[[item.label]]</li>
+                                    <!--<li id$="{{showString(item.value)}}"><a data-args="{{item}}">[[item.label]]</a></li>-->
+                                </template>
+                            </ul>
+                        </template>
+                        <template is="dom-if" if="{{showTabIndex(1,tabIndex)}}">
+                            <ul id="province" on-click="chooseProvince">
+                                <template is="dom-repeat" items="{{provincesItems}}">
+                                    <li id$="{{showString(item.value)}}" data-args="{{item}}">[[item.label]]</li>
+                                    <!--<li id$="{{showString(item.value)}}"><a on-click="chooseProvince"  data-args="{{item}}">[[item.label]]</a></li>-->
+                                </template>
+                            </ul>
+                        </template>
+                        <template is="dom-if" if="{{showTabIndex(2,tabIndex)}}">
+                            <ul id="city" on-click="chooseCity">
+                                <template is="dom-repeat" items="{{cityItems}}">
+                                    <li id$="{{showString(item.value)}}" data-args="{{item}}">[[item.label]]</li>
+                                    <!--<li id$="{{showString(item.value)}}"><a on-click="chooseCity"  data-args="{{item}}">[[item.label]]</a></li>-->
+                                </template>
+                            </ul>
+                        </template>
+                        <template is="dom-if" if="{{showTabIndex(3,tabIndex)}}">
+                            <ul id="zone" on-click="chooseZone">
+                                <template is="dom-repeat" items="{{zoneItems}}">
+                                    <li id$="{{showString(item.value)}}" data-args="{{item}}">[[item.label]]</li>
+                                    <!--<li id$="{{showString(item.value)}}"><a on-click="chooseZone"  data-args="{{item}}">[[item.label]]</a></li>-->
+                                </template>
+                            </ul>
+                        </template>
+                        <template is="dom-if" if="{{showTabIndex(4,tabIndex)}}">
+                            <ul id="street" on-click="chooseStreet">
+                                <template is="dom-repeat" items="{{streetItems}}">
+                                    <li id$="{{showString(item.value)}}" data-args="{{item}}">[[item.label]]</li>
+                                    <!--<li id$="{{showString(item.value)}}"><a on-click="chooseStreet"  data-args="{{item}}">[[item.label]]</a></li>-->
+                                </template>
+                            </ul>
+                        </template>
+                    </div>
+                </div>
+            </iron-dropdown>
+            <!--tip: areaCode 不正确 -->
+            <template is="dom-if" if="{{isTip}}">
+                <span style="color: red">地址编码不正确,请检查！</span>
+            </template>
+        </div>
+        </template>
+        <template is="dom-if" if="{{isView}}">
+            <span>{{detailAddress}}</span>
+        </template>
+    </template>
+    <script type="text/javascript" src="h-address.js"></script>
+</dom-module>

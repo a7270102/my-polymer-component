@@ -1,0 +1,110 @@
+<dom-module id='h-tip'>
+    <template>
+        <style>
+            :host{
+                position: relative;
+                display: block;
+            }
+            .words{
+                font-size: 12px;
+                position: absolute;
+                min-width: 170px;
+                box-sizing: border-box;
+                background: #000;
+                color: #fff;
+                border-radius: 5px;
+                line-height: 18px;
+                padding: 5px;
+                animation-duration: .5s;
+                display: none;
+            }
+            .arrow{
+                display: block;
+                position: absolute;
+                border-left: solid 5px transparent;
+                border-right: solid 5px transparent;
+                border-top: solid 8px #000;
+                left: 50%;
+                top: 100%;
+                margin-left: -4px;
+            }
+
+            @keyframes bounceInUp {
+                0% {
+                    opacity: 0;
+                    transform: translate3d(0, 30px, 0)
+                }
+                100% {
+                    transform: translate3d(0, 0, 0)
+                }
+            }
+
+            .bounceInUp {
+                animation-name: bounceInUp
+            }
+
+            @keyframes fadeOut {
+                0% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0;
+                }
+            }
+
+            .fadeOut {
+                animation-name: fadeOut
+            }
+        </style>
+        <div class="words animated bounceInUp" id="message">
+            {{message}}
+            <i class="arrow"></i>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is:'h-tip',
+            properties: {
+                message: {                  // 错误提示信息
+                    type: String,
+                    notify: true
+                },
+                bindFor: String,            // 绑定的输入元素id
+                belongs: String,            // 组件当前属于那个页面
+                inputValue: String,         // 需要校验的输入值
+                allowPattern: String,       // 校验正则表达式
+            },
+            observers:['_validate(allowPattern, inputValue)'],
+            _validate: function(pattern, value) {
+                var regexp;
+                var msgWrap = this.$.message;
+                if(pattern) {
+                    regexp = new RegExp(pattern, 'g');
+                    if(!regexp.test(value)) {
+                        $(msgWrap).show();
+                    } else {
+                        $(msgWrap).hide();
+                    }
+                }
+            },
+            attached:function(){
+                this._resetPosition();
+            },
+            _resetPosition:function(){
+                var ctx = document.querySelector(this.belongs);
+                var msgWrap = this.$.message;
+                if(!ctx){
+                    this.message = "当前组件找不到所属页面，请设置belongs属性";
+                    $(msgWrap).show();
+                    return;
+                }
+                var inputNode = ctx.querySelector("#" + this.bindFor);
+                var w = $(inputNode).outerWidth();
+                var h = $(inputNode).outerHeight();
+                msgWrap.style.width= w+'px';
+                msgWrap.style.bottom= h + 5 +'px';
+            }
+        })
+    </script>
+
+</dom-module>

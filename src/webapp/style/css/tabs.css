@@ -1,0 +1,21 @@
+paper-tabs, paper-toolbar {
+    color: #666;
+    border-bottom: 1px solid #dddddd;
+    padding-left: 20px;
+}
+
+paper-toolbar paper-tabs {
+    box-shadow: none;
+}
+
+paper-tabs[noink][no-bar] paper-tab.iron-selected {
+    color: #337ab7;
+    font-weight: bold;
+    background-color: #ffffff;
+}
+paper-tabs.h-asddress-tabs #tabsContainer.paper-tabs{
+    width: 100%;
+}
+paper-tabs[noink][no-bar].h-asddress-tabs paper-tab.iron-selected:focus .tab-content{
+    font-weight: normal;
+}

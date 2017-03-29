@@ -1,0 +1,53 @@
+<link rel="import" href="bower_components/iron-input/iron-input.html" />
+<link rel="import" href="component/address/h-address.html" />
+<link rel="import" href="component/tip/h-tip.html"/>
+<link rel="import" href="component/tip/h-tip-2.html"/>
+<dom-module id="component-test">
+    <style>
+        :host {
+            display: block;
+        }
+    </style>
+    <template>
+        <div>
+            <div style="display: inline-block">
+                <h4>地址组件</h4>
+                <h-address id="address-one" label="地址(有)" ajax-sync demo area-code="{{areaCode}}"></h-address>
+            </div>
+            <div style="display: inline-block;">
+                <h4>地址组件</h4>
+                <h-address id="address-two" label="地址(无)" ajax-sync demo></h-address>
+            </div>
+        </div>
+        <div>
+            <h4>tip组件</h4>
+            <input is="iron-input" bind-value="{{testInput}}" id="test" name="输入框">
+            <h-tip bind-for="test" belongs="component-test"
+                   allow-pattern="^[a-zA-z0-9]+$"
+                   message="错误提示"
+                   input-value="{{testInput}}"></h-tip>
+        </div>
+        <div>
+            <h4>tip组件2</h4>
+            <h-tip-2 allow-pattern="^[a-zA-z0-9]+$"
+                   message="错误提示"
+                   input-value="{{testInput}}">
+                <input is="iron-input" bind-value="{{testInput}}" name="输入框">
+            </h-tip-2>
+        </div>
+    </template>
+    <script>
+        (function () {
+            Polymer({
+                is: 'component-test',
+                behaviors: [],
+                properties: {
+                    areaCode: {
+                        type: Number,
+                        value: 440106015
+                    }
+                }
+            });
+        }());
+    </script>
+</dom-module>
