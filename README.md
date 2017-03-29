@@ -13,5 +13,5 @@ polymer包  brower_component/
 npm install -g express
 2. 启动服务
 node app.js
-3.在浏览器中查看 localhost:8081/index.html
+3. 在浏览器中查看 localhost:8081/index.html
 组件对应的测试页面位于 src/component-test.html中
